@@ -2,6 +2,7 @@
 const electron = require("electron");
 const path = require("path");
 const isDev = process.env.NODE_ENV === "development" || !electron.app.isPackaged;
+console.log(`isDev: ${isDev}`);
 function createWindow() {
   const mainWindow = new electron.BrowserWindow({
     width: 1440,
@@ -12,11 +13,15 @@ function createWindow() {
       preload: path.join(__dirname, "../preload/index.js"),
       sandbox: false,
       nodeIntegration: false,
-      contextIsolation: true
+      contextIsolation: true,
+      webSecurity: false
     }
   });
   mainWindow.on("ready-to-show", () => {
     mainWindow.show();
+    if (isDev) {
+      mainWindow.webContents.openDevTools();
+    }
   });
   mainWindow.webContents.setWindowOpenHandler((details) => {
     electron.shell.openExternal(details.url);

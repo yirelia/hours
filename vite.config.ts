@@ -11,6 +11,14 @@ export default defineConfig({
     }
   },
   server: {
-    port: 5174
+    port: 5174,
+    open: true,
+    proxy: {
+      '/api': {
+        target: 'http://192.168.121.129:18085',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api.php/v1')
+      }
+    }
   }
 })

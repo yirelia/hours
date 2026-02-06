@@ -1,0 +1,58 @@
+### 获取项目列表
+POST  http://192.168.121.129:18085/api.php/v1/tokens
+Content-Type: application/json
+
+{"account": "simtek", "password": "Simtek123!$"}
+
+GET http://192.168.121.129:18085/api.php/v1/api/projects
+Content-Type: application/json
+token: Token
+{
+    "page": 1,
+    "limit": 100
+}
+
+###
+
+### 获取单个项目
+GET http://192.168.121.129:18085/api.php/v1/api/projects/1
+Content-Type: application/json
+
+###
+
+### 创建项目
+POST http://192.168.121.129:18085/api.php/v1/api/projects
+Content-Type: application/json
+
+{
+    "name": "新项目",
+    "description": "项目描述",
+    "status": "active"
+}
+
+###
+
+### 更新项目
+PUT http://192.168.121.129:18085/api.php/v1/api/projects/1
+Content-Type: application/json
+
+{
+    "name": "更新的项目名称",
+    "description": "更新的描述",
+    "status": "completed"
+}
+
+###
+
+### 删除项目
+DELETE http://192.168.121.129:18085/api.php/v1/api/projects/1
+Content-Type: application/json
+
+###
+
+### 带认证的请求示例
+GET http://192.168.121.129:18085/api.php/v1/api/projects
+Content-Type: application/json
+Authorization: Bearer your_token_here
+
+###

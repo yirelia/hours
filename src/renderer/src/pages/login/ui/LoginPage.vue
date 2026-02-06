@@ -61,17 +61,14 @@ import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
-import { useUserStore } from '@/entities/user'
 
 const router = useRouter()
-const userStore = useUserStore()
-
 const formRef = ref<FormInstance>()
 const loading = ref(false)
 
 const loginForm = reactive({
-  username: '',
-  password: ''
+  username: 'simtek',
+  password: 'Simtek123!$'
 })
 
 const rules: FormRules = {
@@ -90,18 +87,6 @@ const handleLogin = async () => {
     if (valid) {
       loading.value = true
       try {
-        // 模拟登录请求
-        await new Promise(resolve => setTimeout(resolve, 1000))
-
-        // 模拟登录成功
-        userStore.setToken('mock-token-' + Date.now())
-        userStore.setUserInfo({
-          id: '1',
-          username: loginForm.username,
-          name: '管理员',
-          role: 'admin'
-        })
-
         ElMessage.success('登录成功')
         router.push('/hours')
       } catch (error) {

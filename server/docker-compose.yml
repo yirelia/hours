@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  # 后端服务
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hours-server
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: 192.168.121.129
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: root123$!
+      DB_NAME: chandao
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./logs:/app/logs
