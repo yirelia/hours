@@ -1,4 +1,5 @@
 import express, { Application } from "express";
+import path from "path";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
@@ -14,6 +15,13 @@ import hoursRouter from "./routes/hours";
 
 const app: Application = express();
 
+// expression SPA 静态资源（放在 helmet 之前，避免 CSP 限制）
+const expressionPath = path.join(__dirname, "../public/expression");
+app.use("/expression", express.static(expressionPath));
+app.get("/expression/*", (req, res) => {
+  res.sendFile(path.join(expressionPath, "index.html"));
+});
+
 // 中间件
 app.use(helmet()); // 安全头
 app.use(cors({ origin: config.corsOrigin })); // CORS
@@ -21,9 +29,11 @@ app.use(compression()); // 压缩
 app.use(express.json()); // JSON解析
 app.use(express.urlencoded({ extended: true })); // URL解析
 
-// 设置默认 Content-Type 为 JSON
+// 设置默认 Content-Type 为 JSON（仅对 API 路由生效）
 app.use((req, res, next) => {
-  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  if (req.path.startsWith("/api")) {
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+  }
   next();
 });
 

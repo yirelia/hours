@@ -1,44 +1,43 @@
-# 使用官方 Node.js 18 镜像作为基础镜像
-FROM node:18.19.1-alpine3.19 AS builder
+# ---- Stage 1: 构建前端 SPA ----
+FROM node:18.19.1-alpine3.19 AS frontend
 
-# 设置工作目录
 WORKDIR /app
 
-# 复制 package.json 和 package-lock.json（如果存在）
-COPY package*.json ./
+COPY package.json vite.config.ts ./
+COPY src/renderer/ ./src/renderer/
 
-# 安装依赖
-RUN npm ci --only=production
+RUN npm install --ignore-scripts && npx vite build
 
-# 复制 tsconfig.json 和源代码
-COPY tsconfig.json ./
-COPY src ./src
+# ---- Stage 2: 构建 Server ----
+FROM node:18.19.1-alpine3.19 AS backend
 
-# 安装开发依赖并编译 TypeScript
-RUN npm install typescript @types/node --save-dev && \
-    npm run build && \
-    npm prune --production
+WORKDIR /app
 
-# 生产镜像
+COPY server/package*.json ./
+RUN npm install
+
+COPY server/tsconfig.json ./
+COPY server/src/ ./src/
+
+RUN npx tsc && npm prune --production
+
+# ---- Stage 3: 生产镜像 ----
 FROM node:18.19.1-alpine3.19
 
-# 设置工作目录
 WORKDIR /app
 
-# 从 builder 阶段复制编译后的代码和生产依赖
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./
+COPY --from=backend /app/dist ./dist
+COPY --from=backend /app/node_modules ./node_modules
+COPY --from=backend /app/package.json ./
 
-# 创建非 root 用户
+# 前端产物 -> public/expression
+COPY --from=frontend /app/src/renderer/dist ./public/expression
+
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# 切换到非 root 用户
 USER nodejs
 
-# 暴露端口
 EXPOSE 3000
 
-# 启动应用
-CMD ["npm", "start"]
+CMD ["node", "dist/server.js"]

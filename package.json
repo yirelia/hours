@@ -6,6 +6,7 @@
   "license": "MIT",
   "main": "./dist/main/index.js",
   "scripts": {
+    "build:front": "vite build && rm -rf server/public/expression/* && mv src/renderer/dist/* server/public/expression/",
     "dev": "electron-vite dev",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
